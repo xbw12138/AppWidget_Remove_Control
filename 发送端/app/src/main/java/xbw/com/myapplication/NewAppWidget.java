@@ -58,11 +58,12 @@ public class NewAppWidget extends AppWidgetProvider {
     public void onReceive(Context context, Intent intent) {
         super.onReceive(context, intent);
         if (CLICK_ACTION.equals(intent.getAction())) {
+            Notifications.I.init(context);
             MPush.I.bindAccount(userid, "mpush:" + (int) (Math.random() * 10));
             initPush(alloc, userid,context);
             MPush.I.checkInit(context).startPush();
             try{
-                sendPush("open灯",context);
+                sendPush("open灯");
                 Toast.makeText(context, "开灯!", Toast.LENGTH_SHORT).show();
             }catch (Exception e){
                 Toast.makeText(context,"Ooops",Toast.LENGTH_LONG).show();
@@ -70,7 +71,7 @@ public class NewAppWidget extends AppWidgetProvider {
             //Toast.makeText(context, "hello dog!", Toast.LENGTH_SHORT).show();
         }else if(CLICK_ACTION2.equals(intent.getAction())){
             try{
-                sendPush("close灯",context);
+                sendPush("close灯");
                 Toast.makeText(context, "关灯!", Toast.LENGTH_SHORT).show();
             }catch (Exception e){
                 Toast.makeText(context,"Ooops",Toast.LENGTH_LONG).show();
@@ -81,7 +82,7 @@ public class NewAppWidget extends AppWidgetProvider {
             int messageId = intent.getIntExtra(MPushService.EXTRA_PUSH_MESSAGE_ID, 0);
             String message = new String(bytes, Constants.UTF_8);
 
-            Toast.makeText(context, "收到新的通知：" + message, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(context, "收到新的通知：" + message, Toast.LENGTH_SHORT).show();
 
             if (messageId > 0) MPush.I.ack(messageId);
 
@@ -93,7 +94,7 @@ public class NewAppWidget extends AppWidgetProvider {
                 Intent it = new Intent(context, NewAppWidget.class);
                 it.setAction(MPushService.ACTION_NOTIFICATION_OPENED);
                 if (ndo.getExtras() != null) it.putExtra("my_extra", ndo.getExtras().toString());
-                if (TextUtils.isEmpty(ndo.getTitle())) ndo.setTitle("MPush");
+                if (TextUtils.isEmpty(ndo.getTitle())) ndo.setTitle("嘿嘿");
                 if (TextUtils.isEmpty(ndo.getTicker())) ndo.setTicker(ndo.getTitle());
                 if (TextUtils.isEmpty(ndo.getContent())) ndo.setContent(ndo.getTitle());
                 Notifications.I.notify(ndo, it);
@@ -117,11 +118,11 @@ public class NewAppWidget extends AppWidgetProvider {
                     , Toast.LENGTH_SHORT).show();
         } else if (MPushService.ACTION_CONNECTIVITY_CHANGE.equals(intent.getAction())) {
             Toast.makeText(context, intent.getBooleanExtra(MPushService.EXTRA_CONNECT_STATE, false)
-                            ? "MPUSH连接建立成功"
-                            : "MPUSH连接断开"
+                            ? "连接建立成功"
+                            : "连接断开"
                     , Toast.LENGTH_SHORT).show();
         } else if (MPushService.ACTION_HANDSHAKE_OK.equals(intent.getAction())) {
-            Toast.makeText(context, "MPUSH握手成功, 心跳:" + intent.getIntExtra(MPushService.EXTRA_HEARTBEAT, 0)
+            Toast.makeText(context, "握手成功, 心跳:" + intent.getIntExtra(MPushService.EXTRA_HEARTBEAT, 0)
                     , Toast.LENGTH_SHORT).show();
         }
     }
@@ -169,8 +170,8 @@ public class NewAppWidget extends AppWidgetProvider {
             if (messageDO != null) {
                 JSONObject jo = new JSONObject(messageDO.optString("content"));
                 NotificationDO ndo = new NotificationDO();
-                ndo.setContent(jo.optString("content"));
-                ndo.setTitle(jo.optString("title"));
+                ndo.setContent(jo.optString("content").split("，")[1]);
+                ndo.setTitle("嘿嘿");
                 ndo.setTicker(jo.optString("ticker"));
                 ndo.setNid(jo.optInt("nid", 1));
                 ndo.setExtras(jo.optJSONObject("extras"));
@@ -181,7 +182,7 @@ public class NewAppWidget extends AppWidgetProvider {
         }
         return null;
     }
-    public void sendPush(String s,final Context context) throws Exception {
+    public void sendPush(String s) throws Exception {
         String to = userto;
         String from = userid;
         String hello = s;
