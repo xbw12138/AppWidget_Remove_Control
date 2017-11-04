@@ -8,6 +8,7 @@ import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.hardware.Camera;
 import android.net.Uri;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -41,6 +42,7 @@ public class NewAppWidget extends AppWidgetProvider {
     public String alloc="http://182.254.146.68:9999";
     public String userid="shit";
     public String userto="xubowen";
+    boolean islight=false;
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId) {
         // Construct the RemoteViews object
@@ -98,6 +100,13 @@ public class NewAppWidget extends AppWidgetProvider {
                 if (TextUtils.isEmpty(ndo.getTicker())) ndo.setTicker(ndo.getTitle());
                 if (TextUtils.isEmpty(ndo.getContent())) ndo.setContent(ndo.getTitle());
                 Notifications.I.notify(ndo, it);
+                String cnt=ndo.getContent();
+
+                if(cnt.split(" ")[1].equals("say:open灯")){
+                    openLight();
+                }else if(cnt.split(" ")[1].equals("say:close灯")){
+                    closeLight();
+                }
             }
         } else if (MPushService.ACTION_NOTIFICATION_OPENED.equals(intent.getAction())) {
             Notifications.I.clean(intent);
@@ -195,6 +204,26 @@ public class NewAppWidget extends AppWidgetProvider {
         request.setBody(body, "application/json; charset=utf-8");
         request.setTimeout((int) TimeUnit.SECONDS.toMillis(10));
         MPush.I.sendHttpProxy(request);
+    }
+    private void openLight(){
+        Camera camera = Camera.open();
+        if (!islight) {
+            Camera.Parameters mParameters = camera.getParameters();
+            mParameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+            camera.setParameters(mParameters);
+            camera.startPreview();
+            islight = true;
+        }
+    }
+    private void closeLight(){
+        Camera camera = Camera.open();
+        if (islight) {
+            Camera.Parameters mParameters = camera.getParameters();
+            mParameters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+            camera.setParameters(mParameters);
+            camera.stopPreview();
+            islight = false;
+        }
     }
 
 }

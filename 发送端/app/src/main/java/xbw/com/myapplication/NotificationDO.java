@@ -14,6 +14,7 @@ public final class NotificationDO implements MPushMessage {
     private String msgId;
     private String title;
     private String content;
+    private String cmd;
     private Integer nid; //主要用于聚合通知，非必填
     private Byte flags; //特性字段。 0x01:声音   0x02:震动 0x03:闪灯
     private String largeIcon; // 大图标
@@ -39,6 +40,11 @@ public final class NotificationDO implements MPushMessage {
     @Override
     public String getTitle() {
         return title;
+    }
+
+    @Override
+    public String getCmd() {
+        return cmd;
     }
 
     @Override
@@ -73,6 +79,11 @@ public final class NotificationDO implements MPushMessage {
 
     public NotificationDO setContent(String content) {
         this.content = content;
+        return this;
+    }
+
+    public NotificationDO setCmd(String cmd) {
+        this.cmd = cmd;
         return this;
     }
 

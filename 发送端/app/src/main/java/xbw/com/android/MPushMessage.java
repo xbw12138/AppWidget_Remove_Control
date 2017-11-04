@@ -37,6 +37,8 @@ public interface MPushMessage {
 
     String getContent();
 
+    String getCmd();
+
     Integer getNumber();
 
     Byte getFlags();
